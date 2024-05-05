@@ -4,10 +4,20 @@ const axios = require('axios');
 const app = express();
 
 const GITHUB_OWNER = 'Flying-Raccoon-AI';
+const GROUP_ID = 'tech.flyingraccoon';
 
 app.get('*', async (req, res) => {
     try {
-        const targetURL = `https://maven.pkg.github.com/${GITHUB_OWNER}/raccoon-android`;
+         const pattern = new RegExp(`^\/${GROUP_ID}\/(.+)$`);
+
+        const match = req.path.match(pattern);
+
+        if (!match) {
+            return res.status(404).send('Invalid path: ' + req.path);
+        }
+
+        const targetURL = `https://maven.pkg.github.com/${GITHUB_OWNER}/pkg${req.path}`;
+
         const response = await axios.get(targetURL, {
             headers: { 
                 'Authorization': `token ${process.env.GH_TOKEN}`,
